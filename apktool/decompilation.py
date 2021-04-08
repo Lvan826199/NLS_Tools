@@ -1,5 +1,5 @@
 #coding=utf-8
-
+import logging
 import os
 #1.提取设备中的framework-res.apk进行反编译
 #adb pull /system/framework/framework-res.apk
@@ -8,20 +8,22 @@ class Decompilation():
 
     def __init__(self,apk_name):
         self.apk_name = apk_name
-        print("framework-res提取")
+        # print("framework-res提取")
+        logging.debug("framework-res提取")
 
     def get_values(self):
         # framework_showpath = os.popen("cd .. && cd resources && cd framework-res && chdir").read()
         framework_showpath = os.popen("cd resources && cd framework-res && chdir").read()
         framework_path = framework_showpath.strip()
-        print(framework_path)
+        # print(framework_path)
         apktool_file = os.listdir("./apktool")
-        print("apktool_file",apktool_file)
+        # print("apktool_file",apktool_file)
         # framework_res = os.listdir("../resources/framework-res")
         framework_res = os.listdir("./resources/framework-res")
 
         if ("framework-res.apk" in apktool_file) and ("1.apk" in framework_res):
-            print("已存在")
+            # print("已存在")
+            logging.debug("已存在")
         else:
             try:
 
@@ -53,9 +55,11 @@ class Decompilation():
         #如果执行成功，输出为0，否则执行失败
         if msg == 0:
             print("当前apk反编译完成，开始进行xml遍历提取")
+            logging.debug("当前apk反编译完成，开始进行xml遍历提取")
 
         else:
             print(f'当前apk反编译失败,{apk_name},请联系开发人员！')
+            logging.debug(f'当前apk反编译失败,{apk_name},请联系开发人员！')
 
 
 

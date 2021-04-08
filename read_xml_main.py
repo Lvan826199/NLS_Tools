@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import datetime
+import logging
 import os
 import re
 import shutil
@@ -11,6 +12,17 @@ import xlwt
 from xlutils.copy import copy
 from apktool.decompilation import Decompilation
 from pull_apk_into_windows import Pull_apk
+
+def errorlog(func):
+    logger = logging.getLogger()
+
+    def wrapper(self, *args, **kwargs):
+        try:
+            return func(self, *args, **kwargs)  # 执行传入的fn参数
+        except Exception as e:
+            logger.error(msg=e, exc_info=True)
+
+    return wrapper
 
 
 class CompareAllCharts():
@@ -31,7 +43,20 @@ class CompareAllCharts():
         make_result_dir = os.popen(f'cd result && mkdir {now_time} && cd {now_time} && chdir').read()
         self.result_folder = make_result_dir.strip()
 
+    def savelog(self):
+        # print("---------------记录log--------------------")
+        path = "{}\\main.log".format(self.result_folder)
+        # print(f"log路径{path}")
+        logging.basicConfig(level=logging.DEBUG,  # 控制台打印的日志级别
+                            filename=path,
+                            filemode='w',  ##模式，有w和a，w就是写模式，每次都会重新写日志，覆盖之前的日志
+                            # a是追加模式，默认如果不写的话，就是追加模式
+                            format=
+                            '%(asctime)s - [line:%(lineno)d] - %(levelname)s: %(message)s'
+                            # '%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s'
+                            # 日志格式
 
+                            )
 
     # 读取xml文件中<string></string>中间部分的内容，并存储在一个列表中
     def xml_re_string(self, filepath):
@@ -90,7 +115,9 @@ class CompareAllCharts():
             return False
 
     # xls追加写入内容
+    @errorlog
     def write_excel_xls_append(self, path,style = False,height=200,color=0,value=None):
+        self.savelog()
         if style == False:
             style = self.setStyle(200,0)
         else:
@@ -124,12 +151,15 @@ class CompareAllCharts():
                 for j in range(0, len(value[i])):
                     new_worksheet.write(i + rows_old, j, value[i][j], style)  # 追加写入数据，注意是从i+rows_old行开始写入
             new_workbook.save(path)  # 保存工作簿
-            print("xls格式表格【追加】写入数据成功！")
+            # print("xls格式表格【追加】写入数据成功！")
+            logging.debug("xls格式表格【追加】写入数据成功！")
 
 
     # 不需要把研发的字符写进去表格，因为没法进行一个个对比，也没必要写
     # 字符就单独保存在一个列表里面，取出xml文件中的字符，然后循环对比
+    @errorlog
     def get_standard_excel_msg(self, standard_scale_excel):
+        self.savelog()
         '''
         return : 返回不带引号的列表字符(后期需要更改为字典，提高查找效率)
         '''
@@ -150,7 +180,9 @@ class CompareAllCharts():
         return fristcol_list
 
     #获取哪些勾选了需要提取的apk名字
+    @errorlog
     def get_select_apk(self):
+        self.savelog()
         xl = xlrd.open_workbook("./setting/select_apk_package.xlsx")
         table = xl.sheet_by_index(0)
         # 读取表格第一列除去第一行的值
@@ -175,6 +207,7 @@ class CompareAllCharts():
             package_name = table.cell(i, 2).value
             packagelist.append(package_name)  # 获取select为1的package
         print("当前表中select为1对应的包名为：{}".format(packagelist))
+        logging.debug("当前表中select为1对应的包名为：{}".format(packagelist))
 
         return packagelist
 
@@ -184,7 +217,9 @@ class CompareAllCharts():
 
 
     # 返回目标文件夹中所有的子文件夹
+    @errorlog
     def get_xmldirs(self):
+        self.savelog()
         # path = os.path.join(os.getcwd(),"temp")
         path = "temp"
         dirpaths = []
@@ -200,7 +235,9 @@ class CompareAllCharts():
         return dirpaths
 
     # 获取研发的所有表格以及名字，返回一个列表
+    @errorlog
     def get_RD_excel(self):
+        self.savelog()
         path = "./resources/RD_excel"
         for root, dirs, files in os.walk(path):
             # root 表示当前正在访问的文件夹路径
@@ -219,7 +256,9 @@ class CompareAllCharts():
         return all_language_id_list
 
     #把excel的名字和excel的language_id组合成一个字典，language_id为键，excel_name为值
+    @errorlog
     def excel_id(self):
+        self.savelog()
         files = self.get_RD_excel()
         all_language_id_list = self.get_all_language_id()
         excel_id = dict(zip( all_language_id_list,files))
@@ -233,14 +272,15 @@ class CompareAllCharts():
             filepath =  os.path.join(path, f)  # 将文件名映射成绝对路径
             if os.path.isfile(filepath):  # 判断该文件是否为文件或者文件夹
                 os.remove(filepath)  # 若为文件，则直接删除os.path.isdir(filepath)
-                print(str(filepath) + " removed!")
+                # print(str(filepath) + " removed!")
             elif os.path.isdir(filepath):
                 shutil.rmtree(filepath, True)  # 若为文件夹，则删除该文件夹及文件夹内所有文件
-                print("dir " + str(filepath) + " removed!")
+                # print("dir " + str(filepath) + " removed!")
                 # shutil.rmtree(path, True)  # 最后删除img总文件夹
 
 
     # string对比以及结果写入excel
+    @errorlog
     def classify(self):
         '''
              xml_path : 平板中xml文件的路径
@@ -248,6 +288,7 @@ class CompareAllCharts():
              resultexcel_name：表格结果的名字
              language_id：本来的语言
              '''
+        self.savelog()
 
         #获取所有选择的apk的package
         packagelist = self.get_select_apk()
@@ -261,8 +302,10 @@ class CompareAllCharts():
 
             #进行反编译apk
             Decompilation(apk_name).get_values()
-
-            print('*************************************************************')
+            print('\t')
+            logging.debug('\t')
+            print(f'**********************************当前运行{apk_name}***************************')
+            logging.debug(f'**********************************当前运行{apk_name}***************************')
             excel_id_dict = self.excel_id()
             for language_id,excel_file in excel_id_dict.items():
 
@@ -270,9 +313,6 @@ class CompareAllCharts():
 
             # 判断目标结果excel文件是否存在，若无创建新文件
                 result_path = os.path.join(os.getcwd(), f'{self.result_folder}\\{language_id}.xls')
-
-
-                print("结果保存路径：{}".format(result_path))
 
                 self.write_excel_xls_append(path=result_path)
 
@@ -286,7 +326,7 @@ class CompareAllCharts():
                 # (语言需要有一个列表)
                 # re_name = re.compile(r'.*\\{1,2}(\(\d+\) .*?).xml')
                 strings_path_list = self.get_xmldirs()
-                print("string_path_list",strings_path_list)
+                # print("string_path_list",strings_path_list)
                 xml_folder_name = str("values-" + language_id)
                 print(xml_folder_name)
                 xml_path = None
@@ -294,6 +334,7 @@ class CompareAllCharts():
                     folder_name = i.split('\\')[2]
                     if xml_folder_name == folder_name:
                         print("目录为：",i)
+                        logging.debug(f"目录为：{i}")
                         xml_path =i
 
 
@@ -301,9 +342,11 @@ class CompareAllCharts():
                     # 取得xml文件中文字的列表
                     xml_list = self.xml_re_string(xml_path)
                     print("xml_string的长度：",len(xml_list))
+                    logging.debug(f"xml_string的长度：{len(xml_list)}")
                     # 取得标准表格中的字符
                     standard_list = self.get_standard_excel_msg(excel_file_path)
-                    print("标准表格的行数：",len(standard_list))
+                    print("研发表格的行数：",len(standard_list))
+                    logging.debug(f"研发表格的行数：{len(standard_list)}")
 
                     content = []
 
@@ -339,11 +382,16 @@ class CompareAllCharts():
                         pass_sum) + '    ' + 'not_exist:'  + str(not_exist) + '   '+'其中fail:' + str(fail_sum) + '   }'
 
                     self.write_excel_xls_append(path=result_path,value=[[summary]],style=True,height=300,color=2)
-                    print(summary)
-                    print('result file save in ' + result_path)
+                    print(f'当前apk对比统计结果为：{summary}')
+                    logging.debug(f'当前apk对比统计结果为：{summary}')
+                    print(f'文档存放路径为：{result_path} ' )
+                    logging.debug(f'文档存放路径为：{result_path} ' )
+                    print("\n\n")
+                    logging.debug("\n\n")
 
                 else:
                     print("xml_path出问题了")
+                    logging.debug("xml_path出问题了")
 
 
 if __name__ == '__main__':
