@@ -286,6 +286,7 @@ class CompareAllCharts():
                 # (语言需要有一个列表)
                 # re_name = re.compile(r'.*\\{1,2}(\(\d+\) .*?).xml')
                 strings_path_list = self.get_xmldirs()
+                print("string_path_list",strings_path_list)
                 xml_folder_name = str("values-" + language_id)
                 print(xml_folder_name)
                 xml_path = None
@@ -323,16 +324,19 @@ class CompareAllCharts():
                                 # content.append([xml_string, language_read, match_rate])
                                 # print("列表：",content)
                             else:
-                                pass
-                                match_rate = 'FAIL'
-                                # fail_list.append(xml_string)
-                                fail_sum += 1
+                                if language_read == "en":
+                                    match_rate = 'PASS'
+                                    pass_sum += 1
+                                else:
+                                    match_rate = 'FAIL'
+                                    # fail_list.append(xml_string)
+                                    fail_sum += 1
                             # 把不存在标准表格中的写入到表格中
                             content.append([xml_string, language_read, match_rate,package_name])
 
                     self.write_excel_xls_append(path=result_path, value=content)
-                    summary = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '    ' + 'pass:' + str(
-                        pass_sum) + '    ' + 'not_exist:'  + str(not_exist) + '   '+'其中fail:' + str(fail_sum)
+                    summary = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '    ' +'该apk字符总行数：'+str(len(xml_list))+'    '+ '其中:  {  pass:' + str(
+                        pass_sum) + '    ' + 'not_exist:'  + str(not_exist) + '   '+'其中fail:' + str(fail_sum) + '   }'
 
                     self.write_excel_xls_append(path=result_path,value=[[summary]],style=True,height=300,color=2)
                     print(summary)
