@@ -21,7 +21,7 @@ class CompareAllCharts():
                      'et': 'et', 'fi': 'fi', 'fr': 'fr', 'hi': 'hi', 'hr': 'hr', 'hu': 'hu', 'in': 'id', 'it': 'it',
                      'iw': 'he',
                      'ja': 'ja', 'ko': 'ko', 'lt': 'lt', 'lv': 'lv', 'ms': 'ms', 'nb': 'nb', 'nl': 'nl', 'pl': 'pl',
-                     'pt-rBR': 'pt', 'pt-rPT': 'pt', 'ro': 'ro', 'ru': 'ru', 'sk': 'sk', 'sl': 'sl', 'sr': 'sr',
+                     'pt-rBR': 'pt', 'pt-rPT': 'pt', 'pt': 'pt','ro': 'ro', 'ru': 'ru', 'sk': 'sk', 'sl': 'sl', 'sr': 'sr',
                      'sv': 'sv',
                      'th': 'th', 'tl': 'tl', 'tr': 'tr', 'uk': 'uk', 'ur': 'ur', 'vi': 'vi', 'zh-rCN': 'zh',
                      'zh-rTW': 'zh',
