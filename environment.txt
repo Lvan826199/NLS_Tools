@@ -1,0 +1,10 @@
+D:\G_Working\Z_Z_python_environment\environment\NLS_tool\venv\Scripts
+
+D:\G_Working\Z_Z_python_environment\environment\NLS_tool\venv\Lib
+
+
+
+
+pyinstaller
+
+pyinstaller -F -p D:\G_Working\Z_Z_python_environment\environment\NLS_tool\venv\Lib\site-packages labels_main.py
