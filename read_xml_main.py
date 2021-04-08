@@ -9,8 +9,8 @@ import langid
 import xlrd
 import xlwt
 from xlutils.copy import copy
-from NLS_Tools.apktool.decompilation import Decompilation
-from NLS_Tools.pull_apk_into_windows import Pull_apk
+from apktool.decompilation import Decompilation
+from pull_apk_into_windows import Pull_apk
 
 
 class CompareAllCharts():
